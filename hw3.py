@@ -25,6 +25,24 @@ def nandmultiply():
     # a look at the stuff after if __name__ == '__main__': or the nand adder
     # function that we implemented.
 
+    # Store C as binary
+    C_bin = format(C, 'b')[::-1][PSET_DIM]
+    c_allocator = prog.make_allocator('c')
+    cbits = {}
+    for bit in C_bin:
+        cbits[c_allocator] = bit # access bit i as cbits['c[i]']
+
+    # Multiply C by x
+    '''
+    start at c_0
+    for i in len(c)
+        if c_i is 1:
+            go through bits in y (starting at y_i), adding bits from x until i>PSET_DIM
+            (adding means turning 0+0->0, 0+1->1, 1+0->1, 
+                    1+1->0 and add 1 to the next place in y, 
+                    propogating through y until done carrying
+    '''
+
     # "compiles" your completed program as a NAND program string.
     return str(prog)
 

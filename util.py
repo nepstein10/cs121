@@ -258,6 +258,8 @@ class NANDProgram(object):
             self.debugger([output1, output2], [var1, var2, var3])
 
 
+
+
     def __str__(self):
         '''Returns the NAND program as in string form, using only NAND and
         no other syntactic sugar.'''
