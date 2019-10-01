@@ -26,22 +26,35 @@ def nandmultiply():
     # function that we implemented.
 
     # Store C as binary
-    C_bin = format(C, 'b')[::-1][PSET_DIM]
-    c_allocator = prog.make_allocator('c')
-    cbits = {}
-    for bit in C_bin:
-        cbits[c_allocator] = bit # access bit i as cbits['c[i]']
+    C_bin = '{0:128b}'.format(C)[::-1]
+    print C_bin
+    
+    prog.ZERO("Z")
+    prog.ONE("O")
 
-    # Multiply C by x
-    '''
-    start at c_0
-    for i in len(c)
-        if c_i is 1:
-            go through bits in y (starting at y_i), adding bits from x until i>PSET_DIM
-            (adding means turning 0+0->0, 0+1->1, 1+0->1, 
-                    1+1->0 and add 1 to the next place in y, 
-                    propogating through y until done carrying
-    '''
+    # Store C in binary as C0-C127
+    for idx in range(len(C_bin)):
+        if C_bin[idx]:
+            prog.ONE("C" + str(idx))
+        else:
+            prog.ZERO("C" + str(idx))
+
+    # Store the 128 lines of multiplication
+    for row in range(128):
+        for col in range(128):
+            if row == 0:
+                prog.AND("y" + str(row), "C" + str(row), "X" + str(col))
+            else:
+                if col <= row:
+                    prog.AND("l" + str(row) + "-" + str(col), "C" + str(row), "X" + str(col - row))
+                else:
+                    prog.ZERO("l" + str(row) + "-" + str(col))
+
+    # ADD the 128 lines of multiplication
+    for row in range(1, 128):
+        prog.ZERO("C")
+        for j in range(128):
+            prog.ADD_3("C", "y" + str(j), "C", "y" + str(j), "l" + str(row) + "-" + str(j))
 
     # "compiles" your completed program as a NAND program string.
     return str(prog)
