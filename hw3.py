@@ -39,10 +39,10 @@ def nandmultiply():
     for row in range(128):
         for col in range(128):
             if row == 0:
-                prog.AND("y_" + str(col), "C" + str(row), "x_" + str(col))
+                prog.AND("Y[" + str(col) + "]", "C" + str(row), "X[" + str(col) + "]")
             else:
                 if col >= row:
-                    prog.AND("l" + str(row) + "-" + str(col), "C" + str(row),"x_" + str(col - row))
+                    prog.AND("l" + str(row) + "-" + str(col), "C" + str(row),"X[" + str(col - row) + "]")
                 else:
                     prog.ZERO("l" + str(row) + "-" + str(col))
 
@@ -50,7 +50,7 @@ def nandmultiply():
     for row in range(1, 128):
         prog.ZERO("C")
         for j in range(128):
-            prog.ADD_3("y_" + str(j), "C", "C", "y_" + str(j), "l" + str(row) + "-" + str(j))
+            prog.ADD_3("Y[" + str(j) + "]", "C", "C", "Y[" + str(j) + "]", "l" + str(row) + "-" + str(j))
 
     # "compiles" your completed program as a NAND program string.
     return str(prog)
