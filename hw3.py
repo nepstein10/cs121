@@ -26,35 +26,31 @@ def nandmultiply():
     # function that we implemented.
 
     # Store C as binary
-    C_bin = '{0:128b}'.format(C)[::-1]
-    print C_bin
-    
-    prog.ZERO("Z")
-    prog.ONE("O")
+    C_bin = format(C, '128b')[::-1]
 
     # Store C in binary as C0-C127
     for idx in range(len(C_bin)):
-        if C_bin[idx]:
+        if C_bin[idx] == "1":
             prog.ONE("C" + str(idx))
         else:
             prog.ZERO("C" + str(idx))
 
-    # Store the 128 lines of multiplication
+    # Store the 128 lines of multiplication. These only need to be 128 bits long due to the mod
     for row in range(128):
         for col in range(128):
             if row == 0:
-                prog.AND("y" + str(row), "C" + str(row), "X" + str(col))
+                prog.AND("y_" + str(col), "C" + str(row), "x_" + str(col))
             else:
-                if col <= row:
-                    prog.AND("l" + str(row) + "-" + str(col), "C" + str(row), "X" + str(col - row))
+                if col >= row:
+                    prog.AND("l" + str(row) + "-" + str(col), "C" + str(row),"x_" + str(col - row))
                 else:
                     prog.ZERO("l" + str(row) + "-" + str(col))
 
-    # ADD the 128 lines of multiplication
+    # Add the 128 lines of multiplication
     for row in range(1, 128):
         prog.ZERO("C")
         for j in range(128):
-            prog.ADD_3("C", "y" + str(j), "C", "y" + str(j), "l" + str(row) + "-" + str(j))
+            prog.ADD_3("y_" + str(j), "C", "C", "y_" + str(j), "l" + str(row) + "-" + str(j))
 
     # "compiles" your completed program as a NAND program string.
     return str(prog)
@@ -89,11 +85,11 @@ def nandadder(N):
 
 if __name__ == '__main__':
     # Generate the string representation of a NAND prog. that adds numbers
-    addtwo = str(nandadder(2))
-    print(EVAL(addtwo, '0010'))  # 0 + 1 = 1 mod 2
-    print(EVAL(addtwo, '1010'))  # 1 + 1 = 2 mod 2
+    #addtwo = str(nandadder(2))
+    #print(EVAL(addtwo, '0010'))  # 0 + 1 = 1 mod 2
+    #print(EVAL(addtwo, '1010'))  # 1 + 1 = 2 mod 2
 
-    addfive = str(nandadder(10))
+    #addfive = str(nandadder(10))
     # Input Number 1: 11110 --> 15
     # Input Number 2: 10110 --> 13   1111010110
     # Expected Output: 28 --> 001110
@@ -101,13 +97,13 @@ if __name__ == '__main__':
     #816 0000110011
     #877 1011011011
     #    10111001011
-    print(EVAL(addfive,'00001100111011011011'))
+    #print(EVAL(addfive,'00001100111011011011'))
 
     # You should test your implementation.
     # Again, note that the binary strings have the least significant digit first 
     # Or, you can submit to gradescope and run the automatic test cases.
     prog = nandmultiply()
-    for test_integer in [0, 1, 100, 123123123]:
+    for test_integer in [0, 1, 100, 123123]:
         print("Testing C * {}".format(test_integer))
         ans = (test_integer * C) % (2 ** PSET_DIM)
         print("Answer should be: {} with binary:\n{}".format(ans, util.int2bin(ans, PSET_DIM)))
